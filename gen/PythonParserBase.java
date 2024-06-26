@@ -21,11 +21,11 @@ public abstract class PythonParserBase extends Parser {
     public PythonParserBase self = this; // for compatibility with PythonParserBase.py
 
     // https://docs.python.org/3/reference/lexical_analysis.html#soft-keywords
-    public boolean isEqualCurrentTokenText(String tokenText) {
+    public boolean isEqualToCurrentTokenText(String tokenText) {
         return getCurrentToken().getText().equals(tokenText);
     }
 
-    public boolean isnotEqualCurrentTokenText(String tokenText) {
-        return !isEqualCurrentTokenText(tokenText); // for compatibility with the Python 'not' logical operator
+    public boolean isnotEqualToCurrentTokenText(String tokenText) {
+        return !isEqualToCurrentTokenText(tokenText); // for compatibility with the Python 'not' logical operator
     }
 }
