@@ -17,7 +17,7 @@ public class Main {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 // create a parser that feeds off the tokens buffer
         PythonParser parser = new PythonParser(tokens);
-        ParseTree tree = parser.root(); // begin parsing at init rule
+        ParseTree tree = parser.file_input(); // begin parsing at init rule
 
 // Create a generic parse tree walker that can trigger callbacks
 ParseTreeWalker walker = new ParseTreeWalker();
