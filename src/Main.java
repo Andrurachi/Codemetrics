@@ -10,19 +10,20 @@ public class Main {
         PythonLexer lexer;
 
         if (args.length>0)
-            lexer = new PythonLexer(CharStreams.fromFileName(args[0]));
+            lexer = new PythonLexer(CharStreams.fromFileName("input/input.txt"));
         else
             lexer = new PythonLexer(CharStreams.fromStream(System.in));
 // create a buffer of tokens pulled from the lexer
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 // create a parser that feeds off the tokens buffer
         PythonParser parser = new PythonParser(tokens);
-        ParseTree tree = parser.root(); // begin parsing at init rule
+        ParseTree tree = parser.file_input(); // begins parsing at init rule
 
-// Create a generic parse tree walker that can trigger callbacks
-ParseTreeWalker walker = new ParseTreeWalker();
-// Walk the tree created during the parse, trigger callbacks
-walker.walk(new PythonToAnalysis(), tree);
-System.out.println(); // print a \n after translation
+        // Create a generic parse tree walker that can trigger callbacks
+        ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(new PythonToAnalysis(), tree);
+        System.out.println(); // print a \n after translation
     }
 }
+
