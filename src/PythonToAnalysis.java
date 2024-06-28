@@ -4,22 +4,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PythonToAnalysis extends PythonParserBaseListener {
-    private final Map<String, String> functionComplexity = new HashMap<>();
+    private final Map<String, ComplexityInfo> functionComplexity = new HashMap<>();
     private boolean isRecursive = false;
     private String currentFunction = null;
     private int loopDepth = 0;
     private int maxLoopDepth = 0;
+    private int cyclomaticComplexity = 1;
 
-//    @Override
-//    public void enterFile_input(PythonParser.File_inputContext ctx) {
-//        System.out.println("Inicio programa!");
-//    }
+    private static class ComplexityInfo {
+        String bigOComplexity;
+        int cyclomaticComplexity;
+        ComplexityInfo(String bigOComplexity, int cyclomaticComplexity) {
+            this.bigOComplexity = bigOComplexity;
+            this.cyclomaticComplexity = cyclomaticComplexity;
+        }
+    }
 
     @Override
     public void exitFile_input(PythonParser.File_inputContext ctx) {
-        //System.out.println("Fin programa!");
-        for (Map.Entry<String, String> entry : functionComplexity.entrySet()) {
-            System.out.println("Función: " + entry.getKey() + " - Complejidad: " + entry.getValue());
+        for (Map.Entry<String, ComplexityInfo> entry : functionComplexity.entrySet()) {
+            System.out.println(STR."Función: \{entry.getKey()} - Complejidad Big(O): \{entry.getValue().bigOComplexity} - Complejidad Ciclomática: \{entry.getValue().cyclomaticComplexity}");
         }
     }
 
@@ -28,18 +32,14 @@ public class PythonToAnalysis extends PythonParserBaseListener {
         currentFunction = ctx.function_def_raw().NAME().getText();
         isRecursive = false;
         loopDepth = 0;
-        //System.out.println("Inicio de la función: " + currentFunction);
+        maxLoopDepth = 0;
+        cyclomaticComplexity = 1;
     }
 
     @Override
     public void exitFunction_def(PythonParser.Function_defContext ctx) {
-        if (isRecursive) {
-            functionComplexity.put(currentFunction, "No calculable (Recursiva)");
-        } else {
-            String complexity = calculateComplexity();
-            functionComplexity.put(currentFunction, complexity);
-        }
-        //System.out.println("Fin de la función: " + currentFunction);
+        String complexity = isRecursive ? "No calculable (Recursiva)" : calculateBigOComplexity();
+        functionComplexity.put(currentFunction, new ComplexityInfo(complexity, cyclomaticComplexity));
         currentFunction = null;
     }
 
@@ -52,8 +52,9 @@ public class PythonToAnalysis extends PythonParserBaseListener {
 
     @Override
     public void enterFor_stmt(PythonParser.For_stmtContext ctx) {
+        cyclomaticComplexity++;
         loopDepth++;
-        if (loopDepth > maxLoopDepth){
+        if (loopDepth > maxLoopDepth) {
             maxLoopDepth = loopDepth;
         }
     }
@@ -66,7 +67,8 @@ public class PythonToAnalysis extends PythonParserBaseListener {
     @Override
     public void enterWhile_stmt(PythonParser.While_stmtContext ctx) {
         loopDepth++;
-        if (loopDepth > maxLoopDepth){
+        cyclomaticComplexity++;
+        if (loopDepth > maxLoopDepth) {
             maxLoopDepth = loopDepth;
         }
     }
@@ -76,15 +78,38 @@ public class PythonToAnalysis extends PythonParserBaseListener {
         loopDepth--;
     }
 
-    private String calculateComplexity() {
-        // System.out.println("Loop depth: " + loopDepth);
-        // System.out.println("Loop depth: " + maxLoopDepth);
+    @Override
+    public void enterIf_stmt(PythonParser.If_stmtContext ctx) {
+        cyclomaticComplexity++;
+    }
+
+    @Override
+    public void enterElif_stmt(PythonParser.Elif_stmtContext ctx) {
+        cyclomaticComplexity++;
+    }
+
+    @Override
+    public void enterElse_block(PythonParser.Else_blockContext ctx) {
+        cyclomaticComplexity++;
+    }
+
+    @Override
+    public void enterTry_stmt(PythonParser.Try_stmtContext ctx) {
+        cyclomaticComplexity++;
+    }
+
+    @Override
+    public void enterExcept_block(PythonParser.Except_blockContext ctx) {
+        cyclomaticComplexity++;
+    }
+
+    private String calculateBigOComplexity() {
         if (maxLoopDepth == 0) {
             return "O(1)";
         } else if (maxLoopDepth == 1) {
             return "O(n)";
         } else {
-            return "O(n^" + maxLoopDepth + ")";
+            return STR."O(n^\{maxLoopDepth})";
         }
     }
 }
