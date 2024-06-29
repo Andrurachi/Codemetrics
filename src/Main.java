@@ -13,10 +13,6 @@ public class Main {
             lexer = new PythonLexer(file);
         else
             lexer = new PythonLexer(CharStreams.fromStream(System.in));
-        // Calcular el número de caracteres por linea en la entrada
-
-
-
 // create a buffer of tokens pulled from the lexer
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 // create a parser that feeds off the tokens buffer
@@ -31,4 +27,3 @@ public class Main {
         walker.walk(listener, tree);
     }
 }
-
