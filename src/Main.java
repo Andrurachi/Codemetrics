@@ -5,8 +5,8 @@ import java.io.File;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-// create a CharStream that reads from standard input / file
-// create a lexer that feeds off of input CharStream
+    // create a CharStream that reads from standard input / file
+    // create a lexer that feeds off of input CharStream
         PythonLexer lexer;
 
         if (args.length>0)
