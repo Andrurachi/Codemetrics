@@ -8,21 +8,22 @@ public class Main {
 // create a CharStream that reads from standard input / file
 // create a lexer that feeds off of input CharStream
         PythonLexer lexer;
-
+        CharStream file = CharStreams.fromFileName("input/input.txt");
         if (args.length>0)
-            lexer = new PythonLexer(CharStreams.fromFileName(args[0]));
+            lexer = new PythonLexer(file);
         else
             lexer = new PythonLexer(CharStreams.fromStream(System.in));
 // create a buffer of tokens pulled from the lexer
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 // create a parser that feeds off the tokens buffer
         PythonParser parser = new PythonParser(tokens);
-        ParseTree tree = parser.file_input(); // begin parsing at init rule
+        ParseTree tree = parser.file_input(); // begins parsing at init rule
 
-// Create a generic parse tree walker that can trigger callbacks
-ParseTreeWalker walker = new ParseTreeWalker();
-// Walk the tree created during the parse, trigger callbacks
-walker.walk(new PythonToAnalysis(), tree);
-System.out.println(); // print a \n after translation
+        // Create a generic parse tree walker that can trigger callbacks
+        ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        PythonToAnalysis listener = new PythonToAnalysis(file.toString());
+        listener.countCommentsAndLines(tokens);
+        walker.walk(listener, tree);
     }
 }
