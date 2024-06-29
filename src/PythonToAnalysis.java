@@ -49,6 +49,13 @@ public class PythonToAnalysis extends PythonParserBaseListener {
 
     @Override
     public void enterFile_input(PythonParser.File_inputContext ctx) {
+        try {
+            String prompt = "Make a really brief description of the following python code: " + ctx.getText(); // Or extract this from the context
+            String apiResponse = GeminiAPI.callGeminiAPI(prompt);
+            System.out.println(apiResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         numberLines = ctx.getStop().getLine();
     }
 
